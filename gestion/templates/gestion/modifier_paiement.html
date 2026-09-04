@@ -1,0 +1,153 @@
+<!-- gestion/templates/gestion/modifier_paiement.html -->
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Modifier un paiement - YAKAM{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-edit me-2 text-warning"></i>Modifier un paiement</h2>
+        <p class="text-muted">
+            Modification du paiement de <strong>{{ eleve.nom_complet }}</strong>
+        </p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'gestion:detail_eleve' eleve.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-pencil-alt me-2"></i>Formulaire de modification</h5>
+                <small class="text-muted">🔐 Toutes les modifications sont tracées</small>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Informations :</strong>
+                    Paiement enregistré le {{ paiement.created_at|date:"d/m/Y H:i" }} par <strong>{{ paiement.created_by|default:"-" }}</strong>
+                </div>
+                
+                <form method="post" id="paiementForm">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <!-- École -->
+                        <div class="col-md-6">
+                            <label for="{{ form.ecole.id_for_label }}" class="form-label">École *</label>
+                            {{ form.ecole }}
+                            {% if form.ecole.errors %}
+                                <div class="text-danger small">{{ form.ecole.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Élève -->
+                        <div class="col-md-6">
+                            <label for="{{ form.eleve.id_for_label }}" class="form-label">Élève *</label>
+                            {{ form.eleve }}
+                            {% if form.eleve.errors %}
+                                <div class="text-danger small">{{ form.eleve.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Motif -->
+                        <div class="col-md-6">
+                            <label for="{{ form.motif.id_for_label }}" class="form-label">Motif *</label>
+                            {{ form.motif }}
+                            {% if form.motif.errors %}
+                                <div class="text-danger small">{{ form.motif.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Année scolaire -->
+                        <div class="col-md-6">
+                            <label for="{{ form.annee_scolaire.id_for_label }}" class="form-label">Année scolaire *</label>
+                            {{ form.annee_scolaire }}
+                            {% if form.annee_scolaire.errors %}
+                                <div class="text-danger small">{{ form.annee_scolaire.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Montant -->
+                        <div class="col-md-4">
+                            <label for="{{ form.montant.id_for_label }}" class="form-label">Montant *</label>
+                            {{ form.montant }}
+                            {% if form.montant.errors %}
+                                <div class="text-danger small">{{ form.montant.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Type montant -->
+                        <div class="col-md-4">
+                            <label for="{{ form.type_montant.id_for_label }}" class="form-label">Type de montant</label>
+                            {{ form.type_montant }}
+                        </div>
+                        
+                        <!-- Statut -->
+                        <div class="col-md-4">
+                            <label for="{{ form.statut.id_for_label }}" class="form-label">Statut</label>
+                            {{ form.statut }}
+                        </div>
+                        
+                        <!-- Mois payé -->
+                        <div class="col-md-3">
+                            <label for="{{ form.mois_paye.id_for_label }}" class="form-label">📅 Mois payé *</label>
+                            {{ form.mois_paye }}
+                            {% if form.mois_paye.errors %}
+                                <div class="text-danger small">{{ form.mois_paye.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Année payée -->
+                        <div class="col-md-3">
+                            <label for="{{ form.annee_paye.id_for_label }}" class="form-label">📅 Année payée *</label>
+                            {{ form.annee_paye }}
+                            {% if form.annee_paye.errors %}
+                                <div class="text-danger small">{{ form.annee_paye.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Mois concerné -->
+                        <div class="col-md-3">
+                            <label for="{{ form.mois_concerne.id_for_label }}" class="form-label">📅 Mois concerné *</label>
+                            {{ form.mois_concerne }}
+                            {% if form.mois_concerne.errors %}
+                                <div class="text-danger small">{{ form.mois_concerne.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Année concernée -->
+                        <div class="col-md-3">
+                            <label for="{{ form.annee_concerne.id_for_label }}" class="form-label">📅 Année concernée *</label>
+                            {{ form.annee_concerne }}
+                            {% if form.annee_concerne.errors %}
+                                <div class="text-danger small">{{ form.annee_concerne.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Notes -->
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            {{ form.notes }}
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i> Modifier le paiement
+                            </button>
+                            <a href="{% url 'gestion:detail_eleve' eleve.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Annuler
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

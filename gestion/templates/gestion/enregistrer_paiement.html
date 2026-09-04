@@ -1,0 +1,856 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Enregistrer un paiement - YAKAM{% endblock %}
+
+{% block extra_css %}
+<!--  -->
+<style>
+    /* ============================================================
+       STYLE GLOBAL DU FORMULAIRE
+       ============================================================ */
+    .payment-form-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .payment-form-container .dashboard-card {
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .payment-form-container .card-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 20px 28px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .payment-form-container .card-header h5 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .payment-form-container .card-header small {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-left: 34px;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .payment-form-container .card-body {
+        padding: 28px;
+    }
+
+    /* ============================================================
+       LABELS
+       ============================================================ */
+    .payment-form-container .form-label {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1e293b;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .payment-form-container .form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .payment-form-container .form-label .label-icon {
+        margin-right: 6px;
+        color: #4F46E5;
+    }
+
+    .payment-form-container .help-text {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .payment-form-container .help-text i {
+        color: #4F46E5;
+        margin-right: 4px;
+    }
+
+    /* ============================================================
+       🔍 SECTION ÉLÈVE - RECHERCHE TYPE YOUTUBE
+       ============================================================ */
+    .eleve-section {
+        background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+        border-radius: 14px;
+        padding: 20px 24px 24px 24px;
+        border: 2px solid #C7D2FE;
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .eleve-section .section-badge {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background: linear-gradient(135deg, #4F46E5, #7C3AED);
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 16px;
+        border-radius: 20px;
+        box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
+    }
+
+    /* ============================================================
+       🔍 CHAMP DE RECHERCHE ÉLÈVE
+       ============================================================ */
+    .search-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-container input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #C7D2FE;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #1e293b;
+        background: white;
+        transition: all 0.2s ease;
+        height: 50px;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.05);
+    }
+
+    .search-container input:focus {
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+        outline: none;
+    }
+
+    .search-container input::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    /* ============================================================
+       📋 SUGGESTIONS
+       ============================================================ */
+    .suggestions-container {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #C7D2FE;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        max-height: 280px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 8px 30px rgba(79, 70, 229, 0.15);
+    }
+
+    .suggestions-container.show {
+        display: block;
+    }
+
+    .suggestion-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+        background: #EEF2FF;
+    }
+
+    .suggestion-item .suggestion-nom {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+    }
+
+    .suggestion-item .suggestion-badge {
+        background: #EEF2FF;
+        color: #4F46E5;
+        padding: 2px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .suggestion-item .suggestion-info {
+        font-size: 12px;
+        color: #94a3b8;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .suggestion-item .suggestion-detail {
+        text-align: right;
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    /* ============================================================
+       MESSAGES DE CHARGEMENT / RECHERCHE
+       ============================================================ */
+    .suggestions-loading {
+        text-align: center;
+        padding: 16px;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .suggestions-loading i {
+        color: #4F46E5;
+    }
+
+    .suggestions-no-results {
+        text-align: center;
+        padding: 16px;
+        color: #94a3b8;
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    /* ============================================================
+       ÉLÈVE SÉLECTIONNÉ
+       ============================================================ */
+    .selected-eleve {
+        display: none;
+        margin-top: 10px;
+        padding: 10px 14px;
+        background: #ECFDF5;
+        border: 2px solid #10B981;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selected-eleve .selected-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .selected-eleve .selected-info .selected-nom {
+        font-weight: 700;
+        color: #065F46;
+        font-size: 15px;
+    }
+
+    .selected-eleve .selected-info .selected-badge {
+        background: #D1FAE5;
+        color: #065F46;
+        padding: 2px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .selected-eleve .selected-clear {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .selected-eleve .selected-clear:hover {
+        background: #FEE2E2;
+    }
+
+    /* ============================================================
+       CHAMPS STANDARDS
+       ============================================================ */
+    .standard-field .form-control,
+    .standard-field .form-select {
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1e293b;
+        background: white;
+        transition: all 0.2s ease;
+        width: 100%;
+        height: 46px;
+    }
+
+    .standard-field .form-control:focus,
+    .standard-field .form-select:focus {
+        border-color: #4F46E5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+        outline: none;
+    }
+
+    /* ============================================================
+       BOUTONS
+       ============================================================ */
+    .payment-form-container .btn {
+        border-radius: 10px;
+        padding: 12px 28px;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .payment-form-container .btn-success {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+    }
+
+    .payment-form-container .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .payment-form-container .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .payment-form-container .btn-secondary:hover {
+        background: #e2e8f0;
+        transform: translateY(-2px);
+    }
+
+    .payment-form-container .btn i {
+        margin-right: 8px;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 768px) {
+        .payment-form-container .card-body {
+            padding: 16px;
+        }
+
+        .eleve-section {
+            padding: 16px;
+        }
+
+        .search-container input {
+            height: 44px;
+            font-size: 14px;
+        }
+
+        .suggestions-container {
+            max-height: 200px;
+        }
+
+        .suggestion-item {
+            padding: 10px 14px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .suggestion-item .suggestion-detail {
+            text-align: left;
+        }
+
+        .selected-eleve {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .payment-form-container .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .payment-form-container .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-form-container">
+    
+    <!-- ==========================================================
+         TITRE
+         ========================================================== -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 12px;">
+                <span style="background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 8px 14px; border-radius: 10px; font-size: 20px;">
+                    <i class="fas fa-money-bill-wave"></i>
+                </span>
+                Enregistrer un paiement
+            </h2>
+            <p style="color: #94a3b8; font-size: 15px; margin-top: 4px; margin-left: 56px;">
+                Saisir un nouveau paiement d'élève
+            </p>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         FORMULAIRE
+         ========================================================== -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h5>
+                <i class="fas fa-plus-circle" style="color: #4F46E5;"></i>
+                Nouveau paiement
+            </h5>
+            <small>
+                <i class="fas fa-lock me-1" style="color: #4F46E5;"></i>
+                Toutes les opérations sont tracées et sécurisées
+            </small>
+        </div>
+        <div class="card-body">
+            <form method="post" id="paiementForm">
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    
+                    <!-- ==========================================
+                         🔍 SECTION ÉLÈVE - RECHERCHE TYPE YOUTUBE
+                         ========================================== -->
+                    <div class="col-12">
+                        <div class="eleve-section">
+                            <span class="section-badge">
+                                <i class="fas fa-user-graduate me-1"></i> Étape 1
+                            </span>
+                            
+                            <div class="row g-3">
+                                <!-- École -->
+                                <div class="col-md-6">
+                                    <label for="{{ form.ecole.id_for_label }}" class="form-label">
+                                        <i class="fas fa-school label-icon"></i>École <span class="required"></span>
+                                    </label>
+                                    {{ form.ecole }}
+                                    {% if form.ecole.errors %}
+                                        <div class="text-danger small mt-1">{{ form.ecole.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- 📌 Élève - CHAMP DE SAISIE PUR -->
+                                <div class="col-md-6">
+                                    <label for="{{ form.eleve.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user-graduate label-icon"></i>Élève <span class="required"></span>
+                                    </label>
+                                    
+                                    <!-- ✅ CHAMP DE SAISIE (pas un select !) -->
+                                    <div class="search-container">
+                                        <input type="text" 
+                                               id="id_eleve_search" 
+                                               placeholder="🔍 Tapez le nom ou ..."
+                                               autocomplete="off"
+                                               class="form-control">
+                                        
+                                        <!-- Champ caché pour stocker l'ID de l'élève -->
+                                        <input type="hidden" name="eleve" id="id_eleve">
+                                        
+                                        <!-- Conteneur des suggestions -->
+                                        <div id="suggestions" class="suggestions-container"></div>
+                                    </div>
+                                    
+                                    <span class="help-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Tapez pour rechercher
+                                    </span>
+                                    
+                                    <!-- Affichage de l'élève sélectionné -->
+                                    
+                                    
+                                    {% if form.eleve.errors %}
+                                        <div class="text-danger small mt-1">{{ form.eleve.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <!-- ==========================================
+                         📋 RESTE DES CHAMPS
+                         ========================================== -->
+                    <div class="col-12">
+                        <div style="border-top: 2px dashed #e2e8f0; margin: 8px 0 20px 0; position: relative;">
+                            <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: white; padding: 0 16px; color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-arrow-down me-1"></i> Informations du paiement
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Motif + Année scolaire -->
+                    <div class="col-md-6 form-group standard-field">
+                        <label for="{{ form.motif.id_for_label }}" class="form-label">
+                            <i class="fas fa-tag label-icon"></i>Motif <span class="required"></span>
+                        </label>
+                        {{ form.motif }}
+                        {% if form.motif.errors %}
+                            <div class="text-danger small mt-1">{{ form.motif.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 form-group standard-field">
+                        <label for="{{ form.annee_scolaire.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar-alt label-icon"></i>Année scolaire <span class="required"></span>
+                        </label>
+                        {{ form.annee_scolaire }}
+                        <span class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Ex: 2025-2026
+                        </span>
+                        {% if form.annee_scolaire.errors %}
+                            <div class="text-danger small mt-1">{{ form.annee_scolaire.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Montant + Type + Statut -->
+                    <div class="col-md-4 form-group standard-field">
+                        <label for="{{ form.montant.id_for_label }}" class="form-label">
+                            <i class="fas fa-coins label-icon"></i>Montant <span class="required"></span>
+                        </label>
+                        {{ form.montant }}
+                        {% if form.montant.errors %}
+                            <div class="text-danger small mt-1">{{ form.montant.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 form-group standard-field">
+                        <label for="{{ form.type_montant.id_for_label }}" class="form-label">
+                            <i class="fas fa-dollar-sign label-icon"></i>Type de montant
+                        </label>
+                        {{ form.type_montant }}
+                    </div>
+                    
+                    <div class="col-md-4 form-group standard-field">
+                        <label for="{{ form.statut.id_for_label }}" class="form-label">
+                            <i class="fas fa-check-circle label-icon"></i>Statut
+                        </label>
+                        {{ form.statut }}
+                    </div>
+                    
+                    <!-- Mois / Année Payé + Concerné -->
+                    <div class="col-md-3 form-group standard-field">
+                        <label for="{{ form.mois_paye.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar-check label-icon"></i>Mois payé <span class="required"></span>
+                        </label>
+                        {{ form.mois_paye }}
+                        {% if form.mois_paye.errors %}
+                            <div class="text-danger small mt-1">{{ form.mois_paye.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-3 form-group standard-field">
+                        <label for="{{ form.annee_paye.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar label-icon"></i>Année payée <span class="required"></span>
+                        </label>
+                        {{ form.annee_paye }}
+                        {% if form.annee_paye.errors %}
+                            <div class="text-danger small mt-1">{{ form.annee_paye.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-3 form-group standard-field">
+                        <label for="{{ form.mois_concerne.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar-day label-icon"></i>Mois concerné <span class="required">*</span>
+                        </label>
+                        {{ form.mois_concerne }}
+                        <span class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Mois pour lequel on paye
+                        </span>
+                        {% if form.mois_concerne.errors %}
+                            <div class="text-danger small mt-1">{{ form.mois_concerne.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-3 form-group standard-field">
+                        <label for="{{ form.annee_concerne.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar label-icon"></i>Année concernée <span class="required">*</span>
+                        </label>
+                        {{ form.annee_concerne }}
+                        <span class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Année pour laquelle on paye
+                        </span>
+                        {% if form.annee_concerne.errors %}
+                            <div class="text-danger small mt-1">{{ form.annee_concerne.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="col-12 form-group standard-field">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <i class="fas fa-sticky-note label-icon"></i>Notes
+                        </label>
+                        {{ form.notes }}
+                        <span class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            Informations supplémentaires (optionnel)
+                        </span>
+                        {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">{{ form.notes.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- ==========================================
+                         BOUTONS
+                         ========================================== -->
+                    <div class="col-12 form-group" style="margin-top: 12px;">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Enregistrer le paiement
+                            </button>
+                            <a href="{% url 'gestion:dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- jQuery (pour les requêtes AJAX) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    
+    // ============================================================
+    // VARIABLES
+    // ============================================================
+    var searchInput = $('#id_eleve_search');
+    var suggestionsDiv = $('#suggestions');
+    var eleveIdInput = $('#id_eleve');
+    var selectedDiv = $('#selected-eleve');
+    var selectedNom = $('#selected-nom');
+    var selectedBadge = $('#selected-badge');
+    var selectedClasse = $('#selected-classe');
+    var clearBtn = $('#clear-selection');
+    var debounceTimer;
+    var isSelecting = false;
+    
+    // ============================================================
+    // FONCTION : RECHERCHER LES ÉLÈVES
+    // ============================================================
+    function searchEleves(query) {
+        if (query.length < 2) {
+            suggestionsDiv.removeClass('show');
+            return;
+        }
+        
+        suggestionsDiv.html('<div class="suggestions-loading"><i class="fas fa-spinner fa-spin me-2"></i>Recherche en cours...</div>');
+        suggestionsDiv.addClass('show');
+        
+        $.ajax({
+            url: '/api/recherche-eleve/',
+            method: 'GET',
+            data: { term: query },
+            dataType: 'json',
+            success: function(data) {
+                if (data.results.length === 0) {
+                    suggestionsDiv.html('<div class="suggestions-no-results">❌ Aucun élève trouvé</div>');
+                    return;
+                }
+                
+                suggestionsDiv.html('');
+                data.results.forEach(function(eleve) {
+                    var item = $(
+                        '<div class="suggestion-item" data-id="' + eleve.id + '" data-nom="' + eleve.nom_complet + '" data-matricule="' + eleve.matricule + '" data-classe="' + eleve.classe + '">' +
+                            '<div>' +
+                                '<span class="suggestion-nom">' + eleve.nom_complet  + '</span>' +
+                                '<span class="suggestion-badge">' + eleve.matricule  + '</span>' +
+                                '<span class="suggestion-info"> 📚 ' +  eleve.classe  + '</span>' +
+                            '</div>' +
+                            '<div class="suggestion-detail">' +
+                                '<span style="color: #4F46E5; font-weight: 600;">' + eleve.matricule + '</span>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                    
+                    item.on('click', function() {
+                        selectEleve({
+                            id: $(this).data('id'),
+                            nom_complet: $(this).data('nom'),
+                            matricule: $(this).data('matricule'),
+                            classe: $(this).data('classe')
+                        });
+                    });
+                    
+                    suggestionsDiv.append(item);
+                });
+            },
+            error: function() {
+                suggestionsDiv.html('<div class="suggestions-no-results">⚠️ Erreur lors de la recherche</div>');
+            }
+        });
+    }
+    
+    // ============================================================
+    // FONCTION : SÉLECTIONNER UN ÉLÈVE
+    // ============================================================
+    function selectEleve(eleve) {
+        eleveIdInput.val(eleve.id);
+        searchInput.val(eleve.nom_complet);
+        selectedNom.text(eleve.nom_complet);
+        selectedBadge.text(eleve.matricule);
+        selectedClasse.text(eleve.classe);
+        selectedDiv.css('display', 'flex');
+        suggestionsDiv.removeClass('show');
+        searchInput.css('border-color', '#10B981');
+        isSelecting = true;
+    }
+    
+    // ============================================================
+    // FONCTION : EFFACER LA SÉLECTION
+    // ============================================================
+    function clearSelection() {
+        eleveIdInput.val('');
+        searchInput.val('');
+        selectedDiv.css('display', 'none');
+        searchInput.css('border-color', '#9eabdc');
+        suggestionsDiv.removeClass('show');
+        searchInput.focus();
+        isSelecting = false;
+    }
+    
+    // ============================================================
+    // ÉVÉNEMENT : SAISIE DANS LE CHAMP DE RECHERCHE
+    // ============================================================
+    searchInput.on('input', function() {
+        clearTimeout(debounceTimer);
+        var query = $(this).val().trim();
+        
+        if (isSelecting) {
+            isSelecting = false;
+            return;
+        }
+        
+        if (query.length === 0) {
+            suggestionsDiv.removeClass('show');
+            if (eleveIdInput.val()) {
+                clearSelection();
+            }
+            return;
+        }
+        
+        debounceTimer = setTimeout(function() {
+            searchEleves(query);
+        }, 300);
+    });
+    
+    // ============================================================
+    // ÉVÉNEMENT : TOUCHES DU CLAVIER
+    // ============================================================
+    searchInput.on('keydown', function(e) {
+        var items = $('.suggestion-item');
+        var currentSelected = $('.suggestion-item.active');
+        var index = -1;
+        
+        if (items.length === 0) return;
+        
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            
+            if (currentSelected.length) {
+                index = items.index(currentSelected);
+            }
+            
+            if (e.key === 'ArrowDown') {
+                index = Math.min(index + 1, items.length - 1);
+            } else {
+                index = Math.max(index - 1, 0);
+            }
+            
+            items.removeClass('active');
+            $(items[index]).addClass('active');
+            $(items[index])[0].scrollIntoView({ block: 'nearest' });
+        }
+        
+        if (e.key === 'Enter' && currentSelected.length) {
+            e.preventDefault();
+            currentSelected.click();
+        }
+        
+        if (e.key === 'Escape') {
+            suggestionsDiv.removeClass('show');
+        }
+    });
+    
+    // ============================================================
+    // ÉVÉNEMENT : CLIQUER EN DEHORS POUR FERMER
+    // ============================================================
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.search-container').length) {
+            suggestionsDiv.removeClass('show');
+        }
+    });
+    
+    // ============================================================
+    // ÉVÉNEMENT : BOUTON EFFACER
+    // ============================================================
+    clearBtn.on('click', function() {
+        clearSelection();
+    });
+    
+    // ============================================================
+    // STYLE POUR L'ÉLÉMENT ACTIF
+    // ============================================================
+    var style = document.createElement('style');
+    style.textContent = `
+        .suggestion-item.active {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+        }
+        .suggestion-item.active .suggestion-nom {
+            color: white;
+        }
+        .suggestion-item.active .suggestion-badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .suggestion-item.active .suggestion-info {
+            color: rgba(255,255,255,0.8);
+        }
+        .suggestion-item.active .suggestion-detail {
+            color: rgba(255,255,255,0.7);
+        }
+    `;
+    document.head.appendChild(style);
+    
+});
+</script>
+{% endblock %}

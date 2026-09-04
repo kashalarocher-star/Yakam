@@ -1,0 +1,133 @@
+<!-- gestion/templates/gestion/dashboard.html -->
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord - YAKAM{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h2>
+            Tableau de bord
+            <small>Vue d'ensemble de votre établissement</small>
+        </h2>
+    </div>
+    <div class="user-info">
+        <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
+        <div>
+            <div class="user-name">{{ user.username }}</div>
+            <div class="user-role">Direction</div>
+        </div>
+    </div>
+</div>
+
+<!-- Cartes statistiques -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+        <div class="stat-number">{{ total_eleves }}</div>
+        <div class="stat-label">Élèves actifs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-number">{{ paiements_valides }}</div>
+        <div class="stat-label">Paiements valides</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
+        <div class="stat-number">{{ paiements_invalides }}</div>
+        <div class="stat-label">Paiements en attente(Derogation)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
+        <div class="stat-number">{{ montant_fc|floatformat:0 }} FC</div>
+        <div class="stat-label">Total encaissé (FC)</div>
+    </div>
+</div>
+
+<!-- Statistiques par section -->
+<div class="row g-4 mb-4">
+    <div class="col-md-12">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-2 text-primary"></i>Élèves par section</h5>
+            </div>
+            <div class="row">
+                {% for stat in stats_sections %}
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-gray-50 rounded-3">
+                        <div>
+                            <div class="fw-bold">{{ stat.get_nom_display }}</div>
+                            <small class="text-muted">{{ stat.total_eleves }} élèves</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ stat.total_eleves }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center text-muted py-3">
+                    <i class="fas fa-info-circle me-2"></i>Aucune section disponible
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Derniers paiements -->
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h5><i class="fas fa-history me-2 text-primary"></i>Derniers paiements</h5>
+            <a href="{% url 'gestion:historique_paiements' %}">Voir tout <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        {% if derniers_paiements %}
+            {% for paiement in derniers_paiements %}
+            <div class="paiement-item">
+                <div class="paiement-info">
+                    <div>
+                        <div class="fw-semibold">{{ paiement.eleve.nom_complet }}</div>
+                        <small class="text-muted">
+                            {{ paiement.motif }} • {{ paiement.annee_scolaire }}
+                            <br>
+                            📅 {{ paiement.get_mois_concerne_display }} {{ paiement.annee_concerne }}
+                        </small>
+                    </div>
+                    <span class="badge-statut {% if paiement.statut == 'VALIDE' %}valide{% else %}invalide{% endif %}">
+                        {{ paiement.get_statut_display }}
+                    </span>
+                </div>
+                <div class="paiement-montant">
+                    {{ paiement.montant|floatformat:0 }} {{ paiement.type_montant }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                Aucun paiement enregistré
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Accès rapides -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h5><i class="fas fa-bolt me-2 text-warning"></i>Accès rapides</h5>
+        </div>
+        <div class="d-grid gap-2">
+            <a href="{% url 'gestion:ajouter_eleve' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-2"></i> Ajouter un élève
+            </a>
+            <a href="{% url 'gestion:enregistrer_paiement' %}" class="btn btn-success">
+                <i class="fas fa-money-bill-wave me-2"></i> Enregistrer un paiement
+            </a>
+            <a href="{% url 'gestion:liste_eleves' %}" class="btn btn-outline-primary">
+                <i class="fas fa-users me-2"></i> Liste des élèves
+            </a>
+            <a href="{% url 'gestion:rapport' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-file-alt me-2"></i> Générer un rapport
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

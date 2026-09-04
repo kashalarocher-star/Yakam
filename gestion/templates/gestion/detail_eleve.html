@@ -1,0 +1,150 @@
+<!-- gestion/templates/gestion/detail_eleve.html -->
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Détail de l'élève - YAKAM{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-user me-2 text-primary"></i>{{ eleve.nom_complet }}</h2>
+        <p class="text-muted">Détails et historique des paiements</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'gestion:enregistrer_paiement' %}?eleve_id={{ eleve.id }}&ecole_id={{ eleve.ecole.id }}" class="btn btn-success">
+            <i class="fas fa-money-bill-wave me-1"></i> Ajouter un paiement
+        </a>
+        <a href="{% url 'gestion:liste_eleves' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+    </div>
+</div>
+
+<!-- Informations de l'élève -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Informations</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6"><strong>Matricule</strong></div>
+                    <div class="col-6">{{ eleve.matricule }}</div>
+                    
+                    <div class="col-6"><strong>Section</strong></div>
+                    <div class="col-6">{{ eleve.section.get_nom_display }}</div>
+                    
+                    <div class="col-6"><strong>Classe</strong></div>
+                    <div class="col-6">{{ eleve.classe.nom }}</div>
+                    
+                    <div class="col-6"><strong>Option</strong></div>
+                    <div class="col-6">{{ eleve.option|default:"-" }}</div>
+                    
+                    <div class="col-6"><strong>Téléphone parent</strong></div>
+                    <div class="col-6">{{ eleve.telephone_parent|default:"-" }}</div>
+                    
+                    <div class="col-6"><strong>Date d'inscription</strong></div>
+                    <div class="col-6">{{ eleve.date_inscription|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-pie me-2"></i>Résumé des paiements</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="p-3 bg-success bg-opacity-10 rounded-3">
+                            <h5 class="text-success">{{ total_paye_fc|floatformat:0 }} FC</h5>
+                            <small class="text-muted">Total payé (FC)</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-info bg-opacity-10 rounded-3">
+                            <h5 class="text-info">{{ total_paye_usd|floatformat:0 }} USD</h5>
+                            <small class="text-muted">Total payé (USD)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historique des paiements AVEC BOUTONS -->
+<div class="dashboard-card">
+    <div class="card-header">
+        <h5><i class="fas fa-history me-2 text-primary"></i>Historique des paiements</h5>
+        <span class="badge bg-primary">{{ paiements.count }} paiements</span>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Motif</th>
+                    <th>Année scolaire</th>
+                    <th>Montant</th>
+                    <th>📅 Payé</th>
+                    <th>📅 Concerne</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Par</th>
+                    <th>Actions</th>  <!-- ✅ NOUVEAU -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ paiement.motif }}</td>
+                    <td>{{ paiement.annee_scolaire }}</td>
+                    <td><strong>{{ paiement.montant|floatformat:0 }} {{ paiement.type_montant }}</strong></td>
+                    <td>{{ paiement.get_mois_paye_display }} {{ paiement.annee_paye }}</td>
+                    <td>{{ paiement.get_mois_concerne_display }} {{ paiement.annee_concerne }}</td>
+                    <td>
+                        <span class="badge {% if paiement.statut == 'VALIDE' %}badge-success{% elif paiement.statut == 'ANNULE' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ paiement.get_statut_display }}
+                        </span>
+                    </td>
+                    <td>{{ paiement.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>{{ paiement.created_by|default:"-" }}</td>
+                    <td style="white-space: nowrap">
+                        <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
+                        <!-- ✏️ BOUTON MODIFIER -->
+                            <a href="{% url 'gestion:modifier_paiement' paiement.id %}" 
+                            class="btn btn-sm btn-warning" 
+                            title="Modifier ce paiement"
+                            style="padding: 4px 10px; border-radius: 6px; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; color: white; background: linear-gradient(135deg, #F59E0B, #D97706); border: none; cursor: pointer; transition: all 0.2s;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            
+                            <!-- 🗑️ BOUTON SUPPRIMER -->
+                            <a href="{% url 'gestion:supprimer_paiement' paiement.id %}" 
+                            class="btn btn-sm btn-danger" 
+                            title="Supprimer ce paiement"
+                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce paiement ? Cette action est irréversible.')"
+                            style="padding: 4px 10px; border-radius: 6px; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; color: white; background: linear-gradient(135deg, #EF4444, #DC2626); border: none; cursor: pointer; transition: all 0.2s;">    
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                        Aucun paiement pour cet élève
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

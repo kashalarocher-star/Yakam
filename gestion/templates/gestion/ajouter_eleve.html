@@ -1,0 +1,123 @@
+<!-- gestion/templates/gestion/ajouter_eleve.html -->
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Ajouter un élève - YAKAM{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-user-plus me-2 text-primary"></i>Ajouter un élève</h2>
+        <p class="text-muted">Inscrire un nouvel élève dans le système</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit me-2"></i>Formulaire d'inscription</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="eleveForm">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.ecole.id_for_label }}" class="form-label">École *</label>
+                            {{ form.ecole }}
+                            {% if form.ecole.errors %}
+                                <div class="text-danger small">{{ form.ecole.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.matricule.id_for_label }}" class="form-label">Matricule *</label>
+                            {{ form.matricule }}
+                            {% if form.matricule.errors %}
+                                <div class="text-danger small">{{ form.matricule.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.nom_complet.id_for_label }}" class="form-label">Nom complet *</label>
+                            {{ form.nom_complet }}
+                            {% if form.nom_complet.errors %}
+                                <div class="text-danger small">{{ form.nom_complet.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.section.id_for_label }}" class="form-label">Section *</label>
+                            {{ form.section }}
+                            {% if form.section.errors %}
+                                <div class="text-danger small">{{ form.section.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.classe.id_for_label }}" class="form-label">Classe *</label>
+                            {{ form.classe }}
+                            {% if form.classe.errors %}
+                                <div class="text-danger small">{{ form.classe.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.option.id_for_label }}" class="form-label">Option</label>
+                            {{ form.option }}
+                            <small class="text-muted d-block">⚠️ Obligatoire pour les classes 1e à 4e du secondaire</small>
+                            {% if form.option.errors %}
+                                <div class="text-danger small">{{ form.option.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.telephone_parent.id_for_label }}" class="form-label">Téléphone du parent</label>
+                            {{ form.telephone_parent }}
+                            {% if form.telephone_parent.errors %}
+                                <div class="text-danger small">{{ form.telephone_parent.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Enregistrer l'élève
+                            </button>
+                            <a href="{% url 'gestion:liste_eleves' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Annuler
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('id_section').addEventListener('change', function() {
+        const sectionId = this.value;
+        const classeSelect = document.getElementById('id_classe');
+        classeSelect.innerHTML = '<option value="">Chargement...</option>';
+        
+        if (sectionId) {
+            fetch(`/api/get-classes/?section=${sectionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    classeSelect.innerHTML = '<option value="">Sélectionner une classe</option>';
+                    data.classes.forEach(classe => {
+                        const option = document.createElement('option');
+                        option.value = classe.id;
+                        option.textContent = classe.nom;
+                        classeSelect.appendChild(option);
+                    });
+                });
+        } else {
+            classeSelect.innerHTML = '<option value="">Sélectionner une section d\'abord</option>';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!-- gestion/templates/gestion/liste_eleves.html -->
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Liste des élèves - YAKAM{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-users me-2 text-primary"></i>Liste des élèves</h2>
+        <p class="text-muted">{{ total_eleves }} élèves inscrits</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'gestion:ajouter_eleve' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-1"></i> Ajouter un élève
+        </a>
+    </div>
+</div>
+
+<!-- Barre de recherche -->
+<div class="dashboard-card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                {{ form.nom }}
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-1"></i> Rechercher
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tableau des élèves -->
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Matricule</th>
+                <th>Nom complet</th>
+                <th>Section</th>
+                <th>Classe</th>
+                <th>Option</th>
+                <th>Téléphone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eleve in eleves %}
+            <tr>
+                <td><strong>{{ eleve.matricule }}</strong></td>
+                <td>{{ eleve.nom_complet }}</td>
+                <td><span class="badge bg-primary">{{ eleve.section.get_nom_display }}</span></td>
+                <td>{{ eleve.classe.nom }}</td>
+                <td>{{ eleve.option|default:"-" }}</td>
+                <td>{{ eleve.telephone_parent|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'gestion:detail_eleve' eleve.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                    Aucun élève trouvé
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
