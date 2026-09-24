@@ -23,6 +23,7 @@ urlpatterns = [
     path('paiements/historique/', views.historique_paiements, name='historique_paiements'),
     path("paiements/modifier/<int:paiement_id>", views.modifier_paiement, name="modifier_paiement"),
     path('paiements/supprimer/int<int:paiement_id>/', views.supprimer_paiement, name='supprimer_paiement'),
+    path('paiements/annuler/<int:paiement_id>/', views.annuler_paiement, name='annuler_paiement'),
     
     # Rapport
     path('rapport/', views.rapport, name='rapport'),
@@ -30,4 +31,11 @@ urlpatterns = [
     # API
     path('api/get-classes/', views.api_get_classes, name='api_get_classes'),
     path('api/recherche-eleve/', views.api_recherche_eleve, name='api_recherche_eleve'),
+
+# 💰 SORTIES
+    path('sorties/enregistrer/', views.enregistrer_sortie, name='enregistrer_sortie'),
+    path('sorties/historique/', views.historique_sorties, name='historique_sorties'),
+    path('sorties/modifier/<int:sortie_id>/', views.modifier_sortie, name='modifier_sortie'),
+    path('sorties/supprimer/<int:sortie_id>/', views.supprimer_sortie, name='supprimer_sortie'),
+    path('sorties/annuler/<int:sortie_id>/', views.annuler_sortie, name='annuler_sortie'),
 ]

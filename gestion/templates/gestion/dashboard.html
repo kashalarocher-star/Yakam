@@ -5,44 +5,145 @@
 {% block title %}Tableau de bord - YAKAM{% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div>
-        <h2>
-            Tableau de bord
-            <small>Vue d'ensemble de votre établissement</small>
-        </h2>
+
+
+<!-- ============================================================
+     💰 CAISSE : ENTRÉES / SORTIES / SOLDE
+     ============================================================ -->
+<div style="background: white; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h5 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 10px;">
+            <span style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 6px 12px; border-radius: 8px; font-size: 14px;">
+                <i class="fas fa-wallet"></i>
+            </span>
+            Gestion de la caisse
+        </h5>
+        <span style="background: #f1f5f9; padding: 4px 14px; border-radius: 20px; font-size: 12px; color: #64748b; font-weight: 600;">
+            <i class="fas fa-exchange-alt me-1" style="color: #f59e0b;"></i>
+            1 USD = {{ taux_change|floatformat:0 }} FC
+        </span>
     </div>
-    <div class="user-info">
-        <div class="avatar">{{ user.username|slice:":1"|upper }}</div>
-        <div>
-            <div class="user-name">{{ user.username }}</div>
-            <div class="user-role">Direction</div>
+    
+    <!-- 3 CARTES -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px;">
+        
+        <!-- ENTRÉES -->
+        <div style="background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border-radius: 12px; padding: 20px; border: 1px solid #A7F3D0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="background: #10B981; color: white; padding: 8px 12px; border-radius: 8px; font-size: 16px;">
+                    <i class="fas fa-arrow-down"></i>
+                </span>
+                <div style="font-size: 13px; font-weight: 700; color: #065F46; text-transform: uppercase;">
+                    Total des entrées
+                </div>
+            </div>
+            <div style="font-size: 28px; font-weight: 800; color: #065F46;">
+                {{ total_entrees_usd|floatformat:2 }} <span style="font-size: 16px;">USD</span>
+            </div>
+            <div style="font-size: 12px; color: #047857; margin-top: 4px;">
+                {{ entrees_usd|floatformat:2 }} USD + {{ entrees_fc|floatformat:0 }} FC
+            </div>
         </div>
+        
+        <!-- SORTIES -->
+        <div style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); border-radius: 12px; padding: 20px; border: 1px solid #FECACA;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="background: #EF4444; color: white; padding: 8px 12px; border-radius: 8px; font-size: 16px;">
+                    <i class="fas fa-arrow-up"></i>
+                </span>
+                <div style="font-size: 13px; font-weight: 700; color: #991B1B; text-transform: uppercase;">
+                    Total des sorties
+                </div>
+            </div>
+            <div style="font-size: 28px; font-weight: 800; color: #991B1B;">
+                {{ total_sorties_usd|floatformat:2 }} <span style="font-size: 16px;">USD</span>
+            </div>
+            <div style="font-size: 12px; color: #B91C1C; margin-top: 4px;">
+                {{ sorties_usd|floatformat:2 }} USD + {{ sorties_fc|floatformat:0 }} FC
+            </div>
+        </div>
+        
+        <!-- SOLDE -->
+        <div style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border-radius: 12px; padding: 20px; border: 1px solid #C7D2FE;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="background: #4F46E5; color: white; padding: 8px 12px; border-radius: 8px; font-size: 16px;">
+                    <i class="fas fa-wallet"></i>
+                </span>
+                <div style="font-size: 13px; font-weight: 700; color: #3730A3; text-transform: uppercase;">
+                    Solde disponible
+                </div>
+            </div>
+            <div style="font-size: 28px; font-weight: 800; color: {% if solde_usd >= 0 %}#3730A3{% else %}#DC2626{% endif %};">
+                {{ solde_usd|floatformat:2 }} <span style="font-size: 16px;">USD</span>
+            </div>
+            <div style="font-size: 12px; color: #4F46E5; margin-top: 4px;">
+                ≈ {{ solde_fc|floatformat:0 }} FC (indicatif)
+            </div>
+        </div>
+        
     </div>
+    
+    
 </div>
 
-<!-- Cartes statistiques -->
+<!-- ============================================================
+     📊 CARTES STATISTIQUES CLIQUABLES
+     ============================================================ -->
 <div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-        <div class="stat-number">{{ total_eleves }}</div>
-        <div class="stat-label">Élèves actifs</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-        <div class="stat-number">{{ paiements_valides }}</div>
-        <div class="stat-label">Paiements valides</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
-        <div class="stat-number">{{ paiements_invalides }}</div>
-        <div class="stat-label">Paiements en attente(Derogation)</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
-        <div class="stat-number">{{ montant_fc|floatformat:0 }} FC</div>
-        <div class="stat-label">Total encaissé (FC)</div>
-    </div>
+
+    <!-- ✅ ÉLÈVES ACTIFS → Liste des élèves -->
+    <a href="{% url 'gestion:liste_eleves' %}" style="text-decoration: none; display: block;">
+        <div class="stat-card" style="cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, rgba(79,70,229,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+            <div class="stat-number">{{ total_eleves }}</div>
+            <div class="stat-label">Élèves actifs</div>
+            <div style="font-size: 12px; color: #4F46E5; margin-top: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                <i class="fas fa-arrow-right"></i> Voir la liste
+            </div>
+        </div>
+    </a>
+
+    <!-- ✅ PAIEMENTS VALIDES → Historique filtré (statut=VALIDE) -->
+    <a href="{% url 'gestion:historique_paiements' %}?statut=VALIDE" style="text-decoration: none; display: block;">
+        <div class="stat-card" style="cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number">{{ paiements_valides }}</div>
+            <div class="stat-label">Paiements valides</div>
+            <div style="font-size: 12px; color: #10B981; margin-top: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                <i class="fas fa-arrow-right"></i> Voir les valides
+            </div>
+        </div>
+    </a>
+
+    <!-- ✅ PAIEMENTS EN ATTENTE → Historique filtré (statut=INVALIDE) -->
+    <a href="{% url 'gestion:historique_paiements' %}?statut=INVALIDE" style="text-decoration: none; display: block;">
+        <div class="stat-card" style="cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+            <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
+            <div class="stat-number">{{ paiements_invalides }}</div>
+            <div class="stat-label">Paiements en attente</div>
+            <div style="font-size: 12px; color: #F59E0B; margin-top: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                <i class="fas fa-arrow-right"></i> Voir les attentes
+            </div>
+        </div>
+    </a>
+
+    <!-- ✅ TOTAL ENCAISSÉ → Rapport -->
+    <a href="{% url 'gestion:rapport' %}" style="text-decoration: none; display: block;">
+        <div class="stat-card" style="cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
+            <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="stat-number">{{ montant_fc|floatformat:0 }} FC</div>
+            <div class="stat-label">Total encaissé (FC)</div>
+            <div style="font-size: 12px; color: #7C3AED; margin-top: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                <i class="fas fa-arrow-right"></i> Voir le rapport
+            </div>
+        </div>
+    </a>
+
 </div>
 
 <!-- Statistiques par section -->
@@ -121,13 +222,45 @@
             <a href="{% url 'gestion:enregistrer_paiement' %}" class="btn btn-success">
                 <i class="fas fa-money-bill-wave me-2"></i> Enregistrer un paiement
             </a>
+            <a href="{% url 'gestion:enregistrer_sortie' %}" class="btn btn-danger">
+                <i class="fas fa-minus-circle me-1"></i> Ajouter une sortie
+            </a>
             <a href="{% url 'gestion:liste_eleves' %}" class="btn btn-outline-primary">
                 <i class="fas fa-users me-2"></i> Liste des élèves
             </a>
             <a href="{% url 'gestion:rapport' %}" class="btn btn-outline-secondary">
                 <i class="fas fa-file-alt me-2"></i> Générer un rapport
             </a>
+            <a href="{% url 'gestion:historique_sorties' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-list me-1"></i> Historique des sorties
+            </a>
         </div>
     </div>
 </div>
+
+<!-- ============================================================
+     🎨 EFFETS HOVER POUR LES CARTES CLIQUABLES
+     ============================================================ -->
+<style>
+    .stat-card {
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.15);
+    }
+    .stat-card:hover .stat-number {
+        color: #4F46E5;
+    }
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1);
+    }
+    .stat-icon {
+        transition: transform 0.3s ease;
+    }
+    a:hover .stat-card {
+        border-color: #4F46E5;
+    }
+</style>
+
 {% endblock %}

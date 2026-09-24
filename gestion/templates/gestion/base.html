@@ -13,75 +13,470 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* ============================================================
+           🎨 HEADER FIXE YAKAM
+           ============================================================ */
+        .yakam-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #06b6d4 100%);
+            padding: 12px 24px;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
+            height: 72px;
+            /* ✅ Permettre au dropdown de dépasser */
+            overflow: visible !important;
+        }
+        
+        /* Motif de points - élément séparé pour ne pas être coupé */
+        .yakam-header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            background-image: radial-gradient(circle, white 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 0;
+            z-index: 0;
+        }
+        
+        .yakam-header .container-fluid {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0;
+        }
+        
+        /* Logo */
+        .yakam-logo {
+            background: white;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .yakam-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .yakam-logo i {
+            font-size: 22px;
+            color: #4F46E5;
+        }
+        
+        .yakam-brand {
+            color: white;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            line-height: 1;
+        }
+        
+        .yakam-brand:hover {
+            color: white;
+        }
+        
+        .yakam-subtitle {
+            color: rgba(255,255,255,0.85);
+            font-size: 11px;
+            margin: 2px 0 0 0;
+        }
+        
+        /* Navigation */
+        .yakam-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .yakam-nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+        
+        .yakam-nav-link:hover {
+            color: white !important;
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .yakam-nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.25);
+            font-weight: 600;
+        }
+        
+        /* ============================================================
+           ✅ DROPDOWN AU-DESSUS DU HEADER
+           ============================================================ */
+        .dropdown {
+            position: relative;
+        }
+        
+        .yakam-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 9999 !important;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+            padding: 8px;
+            margin-top: 8px;
+            min-width: 240px;
+            background: white;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+        
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .yakam-dropdown-menu .dropdown-item {
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .yakam-dropdown-menu .dropdown-item:hover {
+            background: #EEF2FF;
+            color: #4F46E5;
+            transform: translateX(4px);
+        }
+        
+        .yakam-dropdown-menu .dropdown-item i {
+            width: 20px;
+            color: #4F46E5;
+            margin-right: 10px;
+        }
+        
+        .yakam-dropdown-menu .dropdown-divider {
+            margin: 6px 0;
+            border-color: #f1f5f9;
+        }
+        
+        /* Profil */
+        .yakam-avatar {
+            background: white;
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #4F46E5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .yakam-user-info {
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+        
+        .yakam-user-role {
+            color: rgba(255,255,255,0.75);
+            font-size: 11px;
+        }
+        
+        /* Bouton Déconnexion */
+        .btn-logout {
+            color: white;
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 13px;
+            border: 2px solid rgba(255,255,255,0.4);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .btn-logout:hover {
+            background: #F97316;
+            border-color: #F97316;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+        
+        /* ============================================================
+           ✅ ESPACE POUR LE HEADER FIXE
+           ============================================================ */
+        .main-wrapper {
+            padding-top: 72px;
+            min-height: 100vh;
+        }
+        
+        .messages-container {
+            padding: 16px 24px 0 24px;
+        }
+        
+        .main-content {
+            padding: 24px;
+        }
+        
+        /* ============================================================
+           ALERTES
+           ============================================================ */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1200px) {
+            .yakam-nav-link {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .yakam-header {
+                padding: 10px 16px;
+                height: 64px;
+            }
+            
+            .main-wrapper {
+                padding-top: 64px;
+            }
+            
+            .yakam-brand {
+                font-size: 17px;
+            }
+            
+            .yakam-logo {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+            }
+            
+            .yakam-logo i {
+                font-size: 18px;
+            }
+            
+            .yakam-nav-link {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .yakam-nav-link i {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .yakam-header {
+                height: auto;
+                min-height: 64px;
+                padding: 10px 12px;
+            }
+            
+            .main-wrapper {
+                padding-top: 120px;
+            }
+            
+            .yakam-header .container-fluid {
+                flex-wrap: wrap;
+            }
+            
+            .yakam-nav {
+                order: 3;
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                margin-top: 8px;
+            }
+            
+            .yakam-user-info, .yakam-user-role {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 16px 12px;
+            }
+            
+            .messages-container {
+                padding: 12px 12px 0 12px;
+            }
+        }
+    </style>
 </head>
 <body>
+    
     {% if user.is_authenticated %}
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: linear-gradient(135deg, #6f20ab 0%, #3a4fed 100%); box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand" href="{% url 'gestion:dashboard' %}">
-                <i class="fas fa-school me-2"></i>YAKAM
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
-                           href="{% url 'gestion:dashboard' %}">
-                            <i class="fas fa-chart-pie me-1"></i> Tableau de bord
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="elevesDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-users me-1"></i> Élèves
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'gestion:liste_eleves' %}">
-                                <i class="fas fa-list me-2"></i> Liste des élèves
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'gestion:ajouter_eleve' %}">
-                                <i class="fas fa-user-plus me-2"></i> Ajouter un élève
-                            </a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="paiementsDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-money-bill-wave me-1"></i> Paiements
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'gestion:enregistrer_paiement' %}">
-                                <i class="fas fa-plus-circle me-2"></i> Enregistrer un paiement
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'gestion:historique_paiements' %}">
-                                <i class="fas fa-history me-2"></i> Historique
-                            </a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'rapport' %}active{% endif %}" 
-                           href="{% url 'gestion:rapport' %}">
-                            <i class="fas fa-file-alt me-1"></i> Rapport
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    
-                    <li class="nav-item">
-                        <a class="nav-link btn-logout-orange-white" href="{% url 'gestion:logout' %}">
-                            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
-                        </a>
-                    </li>
-                </ul>
+    <!-- ============================================================
+         🎨 HEADER FIXE YAKAM
+         ============================================================ -->
+    <header class="yakam-header">
+        
+        <!-- ✅ Motif en arrière-plan (élément séparé pour ne pas couper le dropdown) -->
+        <div class="yakam-header-bg"></div>
+        
+        <div class="container-fluid">
+            
+            <!-- Logo + Titre -->
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'gestion:dashboard' %}" class="yakam-logo">
+                    <i class="fas fa-school"></i>
+                </a>
+                <div>
+                    <a href="{% url 'gestion:dashboard' %}" class="yakam-brand">YAKAM</a>
+                    <p class="yakam-subtitle d-none d-md-block">Gestion des frais scolaires</p>
+                </div>
             </div>
+            
+            <!-- Navigation -->
+            <nav class="yakam-nav">
+                
+                <!-- Tableau de bord -->
+                <a class="yakam-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                   href="{% url 'gestion:dashboard' %}">
+                    <i class="fas fa-chart-pie"></i> <span>Tableau de bord</span>
+                </a>
+                
+                <!-- Élèves -->
+                <div class="dropdown">
+                    <a class="yakam-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                        <i class="fas fa-users"></i> <span>Élèves</span>
+                    </a>
+                    <ul class="dropdown-menu yakam-dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'gestion:liste_eleves' %}">
+                            <i class="fas fa-list"></i> Liste des élèves
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'gestion:ajouter_eleve' %}">
+                            <i class="fas fa-user-plus"></i> Ajouter un élève
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <!-- Paiements -->
+                <div class="dropdown">
+                    <a class="yakam-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                        <i class="fas fa-money-bill-wave"></i> <span>Paiements</span>
+                    </a>
+                    <ul class="dropdown-menu yakam-dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'gestion:enregistrer_paiement' %}">
+                            <i class="fas fa-plus-circle"></i> Enregistrer un paiement
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'gestion:enregistrer_sortie' %}">
+                            <i class="fas fa-minus-circle"></i> Enregistrer une sortie
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'gestion:historique_paiements' %}">
+                            <i class="fas fa-history"></i> Historique des entrées
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'gestion:historique_sorties' %}">
+                            <i class="fas fa-list"></i> Historique des sorties
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <!-- Rapport -->
+                <a class="yakam-nav-link {% if request.resolver_match.url_name == 'rapport' %}active{% endif %}" 
+                   href="{% url 'gestion:rapport' %}">
+                    <i class="fas fa-file-alt"></i> <span>Rapport</span>
+                </a>
+                
+            </nav>
+            
+            <!-- Profil + Déconnexion -->
+            <div class="d-flex align-items-center gap-2">
+                <div class="yakam-avatar">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div class="d-none d-md-block">
+                    <div class="yakam-user-info">{{ user.username }}</div>
+                    <div class="yakam-user-role">Direction</div>
+                </div>
+                
+                <a href="{% url 'gestion:logout' %}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> <span class="d-none d-lg-inline">Déconnexion</span>
+                </a>
+            </div>
+            
         </div>
-    </nav>
+    </header>
     {% endif %}
-
-    <!-- Messages -->
-    <div class="container mt-5 pt-4">
+    
+    <!-- ============================================================
+         ✅ WRAPPER AVEC ESPACE POUR LE HEADER
+         ============================================================ -->
+    <div class="main-wrapper">
+        
+        <!-- Messages -->
         {% if messages %}
+        <div class="messages-container">
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                     <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
@@ -89,15 +484,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
-        {% endif %}
-    </div>
-
-    <!-- Contenu principal -->
-    <main class="{% if user.is_authenticated %}mt-4{% endif %}">
-        <div class="container-fluid px-4 py-3">
-            {% block content %}{% endblock %}
         </div>
-    </main>
+        {% endif %}
+        
+        <!-- Contenu principal -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

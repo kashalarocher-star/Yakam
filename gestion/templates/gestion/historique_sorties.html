@@ -1,0 +1,157 @@
+{% extends 'gestion/base.html' %}
+{% load humanize %}
+
+{% block title %}Historique des sorties - YAKAM{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-list me-2 text-danger"></i>Historique des sorties</h2>
+        <p class="text-muted">{{ total_sorties }} sorties enregistrées</p>
+    </div>
+    <div class="col-auto">
+        <a href="{% url 'gestion:enregistrer_sortie' %}" class="btn btn-danger">
+            <i class="fas fa-plus-circle me-1"></i> Ajouter une sortie
+        </a>
+    </div>
+</div>
+
+<!-- Totaux -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); border-color: #FECACA;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="font-size: 13px; color: #991B1B; font-weight: 600; text-transform: uppercase;">Total sorties USD</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #991B1B;">{{ total_usd|floatformat:2 }} USD</div>
+                </div>
+                <i class="fas fa-dollar-sign" style="font-size: 32px; color: #EF4444; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); border-color: #FECACA;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="font-size: 13px; color: #991B1B; font-weight: 600; text-transform: uppercase;">Total sorties FC</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #991B1B;">{{ total_fc|floatformat:0|intcomma }} FC</div>
+                </div>
+                <i class="fas fa-coins" style="font-size: 32px; color: #EF4444; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="dashboard-card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Catégorie</label>
+                <select name="categorie" class="form-select">
+                    <option value="">Toutes</option>
+                    {% for cat, nom in categories %}
+                    <option value="{{ cat }}" {% if request.GET.categorie == cat %}selected{% endif %}>{{ nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Statut</label>
+                <select name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="VALIDE" {% if request.GET.statut == 'VALIDE' %}selected{% endif %}>✅ Valide</option>
+                    <option value="ANNULE" {% if request.GET.statut == 'ANNULE' %}selected{% endif %}>⛔ Annulé</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Du</label>
+                <input type="date" name="date_debut" class="form-control" value="{{ request.GET.date_debut }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Au</label>
+                <input type="date" name="date_fin" class="form-control" value="{{ request.GET.date_fin }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-1"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tableau -->
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Désignation</th>
+                <th>Catégorie</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Par</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sortie in sorties %}
+            <tr style="{% if sortie.statut == 'ANNULE' %}opacity: 0.6; background: #f8fafc;{% endif %}">
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <strong>{{ sortie.designation }}</strong>
+                    {% if sortie.description %}
+                        <br><small class="text-muted">{{ sortie.description|truncatechars:40 }}</small>
+                    {% endif %}
+                </td>
+                <td><span class="badge bg-secondary">{{ sortie.get_categorie_display }}</span></td>
+                <td>{{ sortie.date_sortie|date:"d/m/Y" }}</td>
+                <td>
+                    <strong class="{% if sortie.statut == 'ANNULE' %}text-muted text-decoration-line-through{% else %}text-danger{% endif %}">
+                        -{{ sortie.montant|floatformat:0|intcomma }} {{ sortie.type_montant }}
+                    </strong>
+                </td>
+                <td>
+                    <span class="badge {% if sortie.statut == 'VALIDE' %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ sortie.get_statut_display }}
+                    </span>
+                </td>
+                <td>{{ sortie.created_by|default:"-" }}</td>
+                <td style="text-align: center; white-space: nowrap;">
+                    <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
+                        <a href="{% url 'gestion:modifier_sortie' sortie.id %}" 
+                           class="btn btn-sm btn-warning" title="Modifier"
+                           style="padding: 4px 8px; border-radius: 6px;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        
+                        {% if sortie.statut == 'VALIDE' %}
+                        <a href="{% url 'gestion:annuler_sortie' sortie.id %}" 
+                           class="btn btn-sm btn-secondary" title="Annuler"
+                           style="padding: 4px 8px; border-radius: 6px;">
+                            <i class="fas fa-ban"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'gestion:supprimer_sortie' sortie.id %}" 
+                           class="btn btn-sm btn-danger" title="Supprimer"
+                           style="padding: 4px 8px; border-radius: 6px;">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                    Aucune sortie enregistrée
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

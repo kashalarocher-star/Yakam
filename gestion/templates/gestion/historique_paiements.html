@@ -1,17 +1,144 @@
-<!-- gestion/templates/gestion/historique_paiements.html -->
 {% extends 'gestion/base.html' %}
-{% load static %}
+{% load humanize %}
 
 {% block title %}Historique des paiements - YAKAM{% endblock %}
 
 {% block content %}
+
+<!-- ============================================================
+     EN-TÊTE
+     ============================================================ -->
 <div class="row mb-4">
     <div class="col">
         <h2><i class="fas fa-history me-2 text-primary"></i>Historique des paiements</h2>
         <p class="text-muted">{{ total_paiements }} paiements enregistrés</p>
     </div>
+    <div class="col-auto">
+        <a href="{% url 'gestion:enregistrer_paiement' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle me-1"></i> Ajouter un paiement
+        </a>
+    </div>
 </div>
 
+<!-- ============================================================
+     CARTES DE TOTAUX
+     ============================================================ -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border-color: #A7F3D0;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="font-size: 13px; color: #065F46; font-weight: 600; text-transform: uppercase;">Total USD</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #065F46;">{{ total_usd|floatformat:2 }} USD</div>
+                </div>
+                <i class="fas fa-dollar-sign" style="font-size: 32px; color: #10B981; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border-color: #C7D2FE;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div style="font-size: 13px; color: #3730A3; font-weight: 600; text-transform: uppercase;">Total FC</div>
+                    <div style="font-size: 24px; font-weight: 800; color: #3730A3;">{{ total_fc|floatformat:0|intcomma }} FC</div>
+                </div>
+                <i class="fas fa-coins" style="font-size: 32px; color: #4F46E5; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     FILTRES
+     ============================================================ -->
+<div class="dashboard-card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-filter me-2 text-primary"></i>Filtres</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            
+            <!-- Élève (recherche par nom) -->
+            <div class="col-md-3">
+                <label class="form-label">Élève</label>
+                <input type="text" name="eleve_nom" class="form-control" 
+                       placeholder="Nom de l'élève..."
+                       value="{{ request.GET.eleve_nom }}">
+            </div>
+            
+            <!-- Statut -->
+            <div class="col-md-2">
+                <label class="form-label">Statut</label>
+                <select name="statut" class="form-select">
+                    <option value="">Tous</option>
+                    {% for code, nom in statut_choices %}
+                    <option value="{{ code }}" {% if request.GET.statut == code %}selected{% endif %}>{{ nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Devise -->
+            <div class="col-md-2">
+                <label class="form-label">Devise</label>
+                <select name="type_montant" class="form-select">
+                    <option value="">Toutes</option>
+                    {% for code, nom in type_choices %}
+                    <option value="{{ code }}" {% if request.GET.type_montant == code %}selected{% endif %}>{{ nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Mois concerné -->
+            <div class="col-md-2">
+                <label class="form-label">Mois concerné</label>
+                <select name="mois" class="form-select">
+                    <option value="">Tous</option>
+                    {% for code, nom in mois_choices %}
+                    <option value="{{ code }}" {% if request.GET.mois == code|stringformat:"s" %}selected{% endif %}>{{ nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Année concernée -->
+            <div class="col-md-3">
+                <label class="form-label">Année concernée</label>
+                <input type="number" name="annee" class="form-control" 
+                       placeholder="Ex: 2026"
+                       value="{{ request.GET.annee }}">
+            </div>
+            
+            <!-- Date début -->
+            <div class="col-md-3">
+                <label class="form-label">Du</label>
+                <input type="date" name="date_debut" class="form-control" value="{{ request.GET.date_debut }}">
+            </div>
+            
+            <!-- Date fin -->
+            <div class="col-md-3">
+                <label class="form-label">Au</label>
+                <input type="date" name="date_fin" class="form-control" value="{{ request.GET.date_fin }}">
+            </div>
+            
+            <!-- Boutons -->
+            <div class="col-md-6">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-search me-1"></i> Filtrer
+                    </button>
+                    <a href="{% url 'gestion:historique_paiements' %}" class="btn btn-secondary" style="flex: 1;">
+                        <i class="fas fa-times me-1"></i> Réinitialiser
+                    </a>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<!-- ============================================================
+     TABLEAU DES PAIEMENTS
+     ============================================================ -->
 <div class="table-container">
     <table>
         <thead>
@@ -19,42 +146,126 @@
                 <th>N°</th>
                 <th>Élève</th>
                 <th>Motif</th>
-                <th>Année</th>
+                <th>Année scolaire</th>
                 <th>Montant</th>
                 <th>📅 Payé</th>
-                <th>📅 Concerne</th>
+                <th>📅 Concerné</th>
                 <th>Statut</th>
                 <th>Date</th>
                 <th>Par</th>
+                <th style="text-align: center;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for paiement in paiements %}
-            <tr>
+            <tr style="{% if paiement.statut == 'ANNULE' %}opacity: 0.6; background: #f8fafc;{% endif %}">
+                
                 <td>{{ forloop.counter }}</td>
-                <td>{{ paiement.eleve.nom_complet }}</td>
-                <td>{{ paiement.motif }}</td>
-                <td>{{ paiement.annee_scolaire }}</td>
-                <td><strong>{{ paiement.montant|floatformat:0 }} {{ paiement.type_montant }}</strong></td>
-                <td>{{ paiement.get_mois_paye_display }} {{ paiement.annee_paye }}</td>
-                <td>{{ paiement.get_mois_concerne_display }} {{ paiement.annee_concerne }}</td>
+                
+                <!-- Élève -->
                 <td>
-                    <span class="badge {% if paiement.statut == 'VALIDE' %}badge-success{% elif paiement.statut == 'ANNULE' %}badge-danger{% else %}badge-warning{% endif %}">
+                    <strong>{{ paiement.eleve.nom_complet }}</strong>
+                    <br><small class="text-muted">{{ paiement.eleve.matricule }}</small>
+                </td>
+                
+                <!-- Motif -->
+                <td>{{ paiement.motif }}</td>
+                
+                <!-- Année scolaire -->
+                <td>{{ paiement.annee_scolaire }}</td>
+                
+                <!-- Montant -->
+                <td>
+                    <strong class="{% if paiement.statut == 'ANNULE' %}text-muted text-decoration-line-through{% else %}text-success{% endif %}">
+                        {{ paiement.montant|floatformat:0|intcomma }} {{ paiement.type_montant }}
+                    </strong>
+                </td>
+                
+                <!-- Mois payé -->
+                <td>{{ paiement.get_mois_paye_display }} {{ paiement.annee_paye }}</td>
+                
+                <!-- Mois concerné -->
+                <td>{{ paiement.get_mois_concerne_display }} {{ paiement.annee_concerne }}</td>
+                
+                <!-- Statut -->
+                <td>
+                    <span class="badge 
+                        {% if paiement.statut == 'VALIDE' %}bg-success
+                        {% elif paiement.statut == 'ANNULE' %}bg-danger
+                        {% else %}bg-warning{% endif %}">
                         {{ paiement.get_statut_display }}
                     </span>
                 </td>
+                
+                <!-- Date de création -->
                 <td>{{ paiement.created_at|date:"d/m/Y H:i" }}</td>
+                
+                <!-- Créé par -->
                 <td>{{ paiement.created_by|default:"-" }}</td>
+                
+                <!-- Actions -->
+                <td style="text-align: center; white-space: nowrap;">
+                    <div style="display: flex; gap: 4px; justify-content: center;">
+                        <a href="{% url 'gestion:modifier_paiement' paiement.id %}" 
+                           class="btn btn-sm btn-warning" title="Modifier"
+                           style="padding: 4px 8px; border-radius: 6px;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        
+                        
+                        
+                        <a href="{% url 'gestion:supprimer_paiement' paiement.id %}" 
+                           class="btn btn-sm btn-danger" title="Supprimer"
+                           onclick="return confirm('⚠️ Supprimer ce paiement ?')"
+                           style="padding: 4px 8px; border-radius: 6px;">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+                
             </tr>
             {% empty %}
             <tr>
-                <td colspan="10" class="text-center text-muted py-4">
+                <td colspan="11" class="text-center text-muted py-4">
                     <i class="fas fa-inbox fa-2x d-block mb-2"></i>
-                    Aucun paiement enregistré
+                    Aucun paiement trouvé
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<!-- ============================================================
+     PIED DE TABLEAU : TOTAL
+     ============================================================ -->
+<div style="background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); border-radius: 12px; padding: 16px 24px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border: 1px solid #e2e8f0;">
+    
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+            <i class="fas fa-calculator me-1"></i> TOTAL
+        </span>
+        <span style="font-size: 14px; color: #64748b;">
+            <i class="fas fa-info-circle me-1" style="color: #4F46E5;"></i>
+            {{ total_paiements }} paiement(s) affiché(s)
+        </span>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 13px; color: #64748b; font-weight: 500;">TOTAL USD</span>
+            <span style="font-size: 20px; font-weight: 800; color: #10B981; background: white; padding: 2px 16px; border-radius: 8px; border: 2px solid #10B981;">
+                {{ total_usd|floatformat:2 }} USD
+            </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 13px; color: #64748b; font-weight: 500;">TOTAL FC</span>
+            <span style="font-size: 20px; font-weight: 800; color: #4F46E5; background: white; padding: 2px 16px; border-radius: 8px; border: 2px solid #4F46E5;">
+                {{ total_fc|floatformat:0|intcomma }} FC
+            </span>
+        </div>
+    </div>
+    
+</div>
+
 {% endblock %}

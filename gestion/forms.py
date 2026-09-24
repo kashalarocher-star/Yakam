@@ -1,6 +1,6 @@
 # gestion/forms.py
 from django import forms
-from .models import Eleve, Paiement, Classe, Section, Ecole
+from .models import Eleve, Paiement, Classe, Section, Ecole, Sortie
 from django.contrib.auth.models import User
 from datetime import datetime
 
@@ -86,7 +86,7 @@ class PaiementForm(forms.ModelForm):
                 'placeholeder': 'Tapez le nom...',
                 'autocomplete': 'off'}),
             'motif': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Frais scolaires'}),
-            'annee_scolaire': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 2025-2026'}),
+            'annee_scolaire': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 2026-2027'}),
             'montant': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0', 'step': '0.01'}),
             'type_montant': forms.Select(attrs={'class': 'form-select'}),
             'statut': forms.Select(attrs={'class': 'form-select'}),
@@ -145,4 +145,59 @@ class RechercheEleveForm(forms.Form):
             'class': 'form-control',
             'placeholder': 'Rechercher un élève par son nom complet...'
         })
+    )
+    
+class SortieForm(forms.ModelForm):
+    """Formulaire pour enregistrer/modifier une sortie"""
+    
+    class Meta:
+        model = Sortie
+        fields = ['ecole', 'designation', 'categorie', 'montant', 'type_montant', 'date_sortie', 'description']
+        widgets = {
+            'ecole': forms.Select(attrs={'class': 'form-select'}),
+            'designation': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Ex: Achat de 50 cahiers'
+            }),
+            'categorie': forms.Select(attrs={'class': 'form-select'}),
+            'montant': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'placeholder': '0', 
+                'step': '0.01'
+            }),
+            'type_montant': forms.Select(attrs={'class': 'form-select'}),
+            'date_sortie': forms.DateInput(attrs={
+                'class': 'form-control', 
+                'type': 'date'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 3, 
+                'placeholder': 'Description supplémentaire...'
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.fields['date_sortie'].initial = datetime.now().date()
+            self.fields['type_montant'].initial = 'USD'
+    
+    def clean_montant(self):
+        montant = self.cleaned_data.get('montant')
+        if montant <= 0:
+            raise forms.ValidationError("Le montant doit être supérieur à 0")
+        return montant
+
+
+class AnnulerSortieForm(forms.Form):
+    """Formulaire pour annuler une sortie"""
+    raison_annulation = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control', 
+            'rows': 3,
+            'placeholder': 'Raison de l\'annulation...'
+        }),
+        label="Raison de l'annulation",
+        required=True
     )

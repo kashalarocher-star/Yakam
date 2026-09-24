@@ -1,0 +1,63 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{% block title %}Supprimer une sortie - YAKAM{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 12px;">
+            <span style="background: linear-gradient(135deg, #EF4444, #DC2626); color: white; padding: 8px 14px; border-radius: 10px; font-size: 20px;">
+                <i class="fas fa-trash"></i>
+            </span>
+            Supprimer une sortie
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="dashboard-card" style="border: 2px solid #EF4444;">
+            <div class="card-header" style="background: #FEF2F2;">
+                <h5 style="color: #991B1B;">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Confirmation
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Attention :</strong> Cette action est irréversible.
+                </div>
+                
+                <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div class="row g-2">
+                        <div class="col-6"><strong>Désignation</strong></div>
+                        <div class="col-6">{{ sortie.designation }}</div>
+                        
+                        <div class="col-6"><strong>Catégorie</strong></div>
+                        <div class="col-6">{{ sortie.get_categorie_display }}</div>
+                        
+                        <div class="col-6"><strong>Montant</strong></div>
+                        <div class="col-6"><strong class="text-danger">{{ sortie.montant }} {{ sortie.type_montant }}</strong></div>
+                        
+                        <div class="col-6"><strong>Date</strong></div>
+                        <div class="col-6">{{ sortie.date_sortie|date:"d/m/Y" }}</div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-danger" style="flex: 1;">
+                            <i class="fas fa-trash me-2"></i> Oui, supprimer
+                        </button>
+                        <a href="{% url 'gestion:historique_sorties' %}" class="btn btn-secondary" style="flex: 1;">
+                            <i class="fas fa-times me-2"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

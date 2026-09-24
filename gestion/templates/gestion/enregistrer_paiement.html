@@ -479,10 +479,7 @@
                                         <div id="suggestions" class="suggestions-container"></div>
                                     </div>
                                     
-                                    <span class="help-text">
-                                        <i class="fas fa-info-circle"></i>
-                                        Tapez pour rechercher
-                                    </span>
+                                   
                                     
                                     <!-- Affichage de l'élève sélectionné -->
                                     
@@ -523,10 +520,7 @@
                             <i class="fas fa-calendar-alt label-icon"></i>Année scolaire <span class="required"></span>
                         </label>
                         {{ form.annee_scolaire }}
-                        <span class="help-text">
-                            <i class="fas fa-info-circle"></i>
-                            Ex: 2025-2026
-                        </span>
+                        
                         {% if form.annee_scolaire.errors %}
                             <div class="text-danger small mt-1">{{ form.annee_scolaire.errors }}</div>
                         {% endif %}

@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
 from datetime import datetime
 
+
 # ============================================================
 # MODÈLE ÉCOLE
 # ============================================================
@@ -147,3 +148,78 @@ class Paiement(models.Model):
         verbose_name = "Paiement"
         verbose_name_plural = "Paiements"
         ordering = ['-created_at']
+        
+class Sortie(models.Model):
+    """
+    Modèle pour les sorties de caisse (dépenses de l'école)
+    """
+    CATEGORIES = [
+        ('FOURNITURES', 'Achat fournitures'),
+        ('ELECTRICITE', 'Électricité'),
+        ('EAU', 'Eau'),
+        ('LOYER', 'Loyer'),
+        ('SALAIRES', 'Salaires'),
+        ('REPARATION', 'Réparation'),
+        ('TRANSPORT', 'Transport'),
+        ('FRAIS_ADMIN', 'Frais administratifs'),
+        ('AUTRE', 'Autre'),
+    ]
+    
+    STATUT_CHOICES = [
+        ('VALIDE', '✅ Valide'),
+        ('ANNULE', '⛔ Annulé'),
+    ]
+    
+    ecole = models.ForeignKey(
+        'Ecole', 
+        on_delete=models.CASCADE, 
+        related_name='sorties', 
+        null=True, 
+        blank=True
+    )
+    designation = models.CharField(max_length=200)
+    categorie = models.CharField(max_length=20, choices=CATEGORIES, default='AUTRE')
+    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    type_montant = models.CharField(
+        max_length=3, 
+        choices=[('FC', 'FC'), ('USD', 'USD')], 
+        default='USD'
+    )
+    date_sortie = models.DateField(default=datetime.now)
+    description = models.TextField(blank=True, null=True)
+    statut = models.CharField(max_length=10, choices=STATUT_CHOICES, default='VALIDE')
+    
+    # 🔐 TRACABILITÉ
+    created_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='sorties_creees'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='sorties_modifiees'
+    )
+    modified_at = models.DateTimeField(auto_now=True)
+    annule_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='sorties_annulees'
+    )
+    annule_at = models.DateTimeField(null=True, blank=True)
+    raison_annulation = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.designation} - {self.montant} {self.type_montant}"
+    
+    class Meta:
+        verbose_name = "Sortie"
+        verbose_name_plural = "Sorties"
+        ordering = ['-date_sortie', '-created_at']        
