@@ -570,7 +570,7 @@ def rapport(request):
     total_general_usd = total_usd + total_fc_en_usd
 
     # ============================================================
-    # 4. ÉVOLUTION (12 derniers mois)
+    # 4. ÉVOLUTION (12 derniers mois) EN USD
     # ============================================================
     evolution_data = []
     for mois in range(1, 13):
@@ -582,8 +582,8 @@ def rapport(request):
             mois_concerne=mois, type_montant='USD', statut='VALIDE'
         ).aggregate(total=Sum('montant'))['total'] or Decimal('0')
         
-        total_usd_en_fc_mois = total_usd_mois * TAUX_CHANGE
-        total_general_mois = total_fc_mois + total_usd_en_fc_mois
+        total_fc_en_usd_mois = total_fc_mois / TAUX_CHANGE
+        total_general_mois = total_usd_mois + total_fc_en_usd_mois
         
         evolution_data.append({
             'mois': mois,
@@ -593,7 +593,7 @@ def rapport(request):
         })
 
     # ============================================================
-    # 5. MONTANT ANTÉRIEUR
+    # 5. MONTANT ANTÉRIEUR (en USD)
     # ============================================================
     mois_actuel = datetime.now().month
     annee_actuelle = datetime.now().year
@@ -603,9 +603,19 @@ def rapport(request):
     if premier_mois_graph <= 0:
         premier_mois_graph += 12
         premiere_annee_graph -= 1
-    
-    montant_anterieur = Paiement.objects.filter(
-        statut='VALIDE'
+
+    montant_anterieur_fc = Paiement.objects.filter(
+        statut='VALIDE', type_montant='FC'
+    ).exclude(
+        mois_concerne__gte=premier_mois_graph,
+        annee_concerne__gte=premiere_annee_graph
+    ).exclude(
+        mois_concerne__lt=premier_mois_graph,
+        annee_concerne__gt=premiere_annee_graph
+    ).aggregate(total=Sum('montant'))['total'] or Decimal('0')
+
+    montant_anterieur_usd = Paiement.objects.filter(
+        statut='VALIDE', type_montant='USD'
     ).exclude(
         mois_concerne__gte=premier_mois_graph,
         annee_concerne__gte=premiere_annee_graph
@@ -614,15 +624,16 @@ def rapport(request):
         annee_concerne__gt=premiere_annee_graph
     ).aggregate(total=Sum('montant'))['total'] or Decimal('0')
     
-    total_periode = total_general_fc - montant_anterieur
+    montant_anterieur = (montant_anterieur_fc / TAUX_CHANGE) + montant_anterieur_usd
+    total_periode = total_general_usd - montant_anterieur
 
     # ============================================================
     # 6. POURCENTAGES
     # ============================================================
-    if total_general_fc > 0:
-        pourcentage_anterieur = (montant_anterieur / total_general_fc) * Decimal('100')
+    if total_general_usd > 0:
+        pourcentage_anterieur = (montant_anterieur / total_general_usd) * Decimal('100')
         pourcentage_fc = (total_fc / total_general_fc) * Decimal('100')
-        pourcentage_usd = (total_usd_en_fc / total_general_fc) * Decimal('100')
+        pourcentage_usd = (total_usd / total_general_usd) * Decimal('100')
     else:
         pourcentage_anterieur = Decimal('0')
         pourcentage_fc = Decimal('0')
