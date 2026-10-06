@@ -132,17 +132,7 @@
     </a>
 
     <!-- ✅ TOTAL ENCAISSÉ → Rapport -->
-    <a href="{% url 'gestion:rapport' %}" style="text-decoration: none; display: block;">
-        <div class="stat-card" style="cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%); border-radius: 50%;"></div>
-            <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
-            <div class="stat-number">{{ montant_fc|floatformat:0 }} FC</div>
-            <div class="stat-label">Total encaissé (FC)</div>
-            <div style="font-size: 12px; color: #7C3AED; margin-top: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                <i class="fas fa-arrow-right"></i> Voir le rapport
-            </div>
-        </div>
-    </a>
+    
 
 </div>
 

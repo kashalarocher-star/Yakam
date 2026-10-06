@@ -1,4 +1,3 @@
-<!-- gestion/templates/gestion/login.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -6,60 +5,393 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - YAKAM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        
+        /* ============================================================
+           ✅ CONTENEUR PRINCIPAL - TAILLE RÉDUITE
+           ============================================================ */
+        .login-container {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            width: 100%;
+            max-width: 850px;          /* ← Réduit de 1000px à 850px */
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            min-height: 520px;          /* ← Réduit de 600px à 520px */
+        }
+        
+        /* ============================================================
+           PARTIE GAUCHE : FORMULAIRE
+           ============================================================ */
+        .login-left {
+            padding: 24px 20px;         /* ← Réduit */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 24px;        /* ← Réduit */
+        }
+        
+        /* ✅ LOGO RÉDUIT */
+        .login-header .logo {
+            width: 100px;               /* ← Réduit de 130px à 100px */
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 6px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 12px rgba(79, 70, 229, 0.15));
+        }
+        
+        .login-header h1 {
+            font-size: 24px;            /* ← Réduit de 28px à 24px */
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .login-header p {
+            color: #94a3b8;
+            font-size: 13px;            /* ← Réduit */
+            margin: 0;
+        }
+        
+        /* ============================================================
+           FORMULAIRE
+           ============================================================ */
+        .login-form {
+            width: 100%;
+            max-width: 320px;           /* ← Réduit de 380px à 320px */
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            position: relative;
+            margin-bottom: 14px;        /* ← Réduit */
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 40px 12px 18px;  /* ← Réduit */
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 13px;               /* ← Réduit */
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .form-group input:focus {
+            border-color: #4F46E5;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+        
+        .form-group .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 13px;
+            pointer-events: none;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;        /* ← Réduit */
+            font-size: 12px;
+        }
+        
+        .form-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        .form-options input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+            accent-color: #4F46E5;
+            cursor: pointer;
+        }
+        
+        .form-options a {
+            color: #4F46E5;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .form-options a:hover {
+            color: #3730A3;
+            text-decoration: underline;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 12px;              /* ← Réduit */
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;            /* ← Réduit */
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-login:hover {
+            background: #3730A3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 18px 0;             /* ← Réduit */
+            color: #94a3b8;
+            font-size: 12px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        /* ✅ BOUTONS SOCIAUX RÉDUITS */
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;                  /* ← Réduit */
+        }
+        
+        .social-btn {
+            width: 38px;                /* ← Réduit de 44px à 38px */
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-btn:hover {
+            border-color: #4F46E5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+        }
+        
+        .social-btn i { font-size: 16px; }   /* ← Réduit */
+        .fa-apple { color: #000; }
+        .fa-google { color: #DB4437; }
+        .fa-facebook-f { color: #4267B2; }
+        
+        /* Messages */
+        .messages { margin-bottom: 16px; }
+        
+        .alert {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .alert-error, .alert-danger {
+            background: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+        
+        .alert-success {
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+        
+        .alert-info {
+            background: #EFF6FF;
+            color: #1E40AF;
+            border: 1px solid #BFDBFE;
+        }
+        
+        /* ============================================================
+           ✅ PARTIE DROITE : CADRE RÉDUIT
+           ============================================================ */
+        .login-right {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #4F46E5 0%, #3730A3 50%, #1E1B4B 100%);
+            min-height: 480px;          /* ← Réduit de 560px à 480px */
+        }
+        
+        .login-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 900px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                max-width: 450px;
+                min-height: auto;
+            }
+            
+            .login-right { display: none; }
+            .login-left { padding: 24px 16px; }
+        }
+        
+        @media (max-width: 500px) {
+            body { padding: 12px; }
+            .login-container { border-radius: 20px; padding: 12px; }
+            .login-header h1 { font-size: 20px; }
+            .login-header .logo { width: 80px; height: 80px; }
+        }
+    </style>
 </head>
 <body>
-    <div class="login-page">
-        <div class="login-card">
-            <div class="login-logo">
-                <h1>🏫 YAKAM</h1>
-                <p>Gestion des frais scolaires</p>
-            </div>
 
+    <div class="login-container">
+        
+        <!-- ============================================================
+             PARTIE GAUCHE : FORMULAIRE
+             ============================================================ -->
+        <div class="login-left">
+            
+            <div class="login-header">
+                <img src="{% static 'images/pc5.logo' %}" 
+                     alt="Logo YAKAM" 
+                     class="logo">
+                <h1>Bienvenu</h1>
+                <p>Veuillez saisir vos identifiants.</p>
+            </div>
+            
             {% if messages %}
+            <div class="messages">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
-            {% endif %}
-
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="username" class="form-label">Nom d'utilisateur</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-gray-50 border-gray-200"><i class="fas fa-user text-gray-400"></i></span>
-                        <input type="text" class="form-control" id="username" name="username" 
-                               placeholder="Entrer votre nom d'utilisateur" required>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Mot de passe</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-gray-50 border-gray-200"><i class="fas fa-lock text-gray-400"></i></span>
-                        <input type="password" class="form-control" id="password" name="password" 
-                               placeholder="Entrer votre mot de passe" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sign-in-alt me-2"></i> Se connecter
-                </button>
-            </form>
-
-            <div class="login-footer">
-                <p>Accès réservé à la direction</p>
-                <p class="small text-muted mt-2">
-                    <i class="fas fa-shield-alt me-1"></i> Connexion sécurisée
-                </p>
             </div>
+            {% endif %}
+            
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <input type="text" 
+                           name="username" 
+                           placeholder="Nom d'utilisateur"
+                           autocomplete="username"
+                           required>
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" 
+                           name="password" 
+                           placeholder="Mot de passe"
+                           autocomplete="current-password"
+                           required>
+                    <i class="fas fa-lock input-icon"></i>
+                </div>
+                
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" name="remember">
+                        Se souvenir de moi
+                    </label>
+                    <a href="#">Mot de passe oublié ?</a>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    Se connecter
+                </button>
+                
+                <div class="divider">ou</div>
+                
+                <div class="social-buttons">
+                    <a href="#" class="social-btn" title="Apple">
+                        <i class="fab fa-apple"></i>
+                    </a>
+                    <a href="#" class="social-btn" title="Google">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-btn" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                </div>
+                
+            </form>
+            
         </div>
+        
+        <!-- ============================================================
+             PARTIE DROITE : VOTRE IMAGE
+             ============================================================ -->
+        <div class="login-right">
+            
+            <!-- ✅ Votre image (déjà présente sur votre écran) -->
+            <img src="{% static 'images/pc1.jpg' %}" alt="Illustration">
+            
+        </div>
+        
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

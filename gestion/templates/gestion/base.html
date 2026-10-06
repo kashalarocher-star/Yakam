@@ -73,7 +73,9 @@
             padding: 0;
         }
         
-        /* Logo */
+        /* ============================================================
+           ✅ LOGO YAKAM (image au lieu de l'icône)
+           ============================================================ */
         .yakam-logo {
             background: white;
             width: 44px;
@@ -86,15 +88,18 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
             text-decoration: none;
+            padding: 3px;
+            overflow: hidden;
         }
         
         .yakam-logo:hover {
             transform: scale(1.05);
         }
         
-        .yakam-logo i {
-            font-size: 22px;
-            color: #4F46E5;
+        .yakam-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         .yakam-brand {
@@ -319,10 +324,6 @@
                 min-width: 38px;
             }
             
-            .yakam-logo i {
-                font-size: 18px;
-            }
-            
             .yakam-nav-link {
                 padding: 6px 10px;
                 font-size: 12px;
@@ -380,15 +381,16 @@
          ============================================================ -->
     <header class="yakam-header">
         
-        <!-- ✅ Motif en arrière-plan (élément séparé pour ne pas couper le dropdown) -->
+        <!-- ✅ Motif en arrière-plan -->
         <div class="yakam-header-bg"></div>
         
         <div class="container-fluid">
             
             <!-- Logo + Titre -->
             <div class="d-flex align-items-center gap-2">
+                <!-- ✅ LOGO YAKAM (image) -->
                 <a href="{% url 'gestion:dashboard' %}" class="yakam-logo">
-                    <i class="fas fa-school"></i>
+                    <img src="{% static 'images/pc5.logo' %}" alt="YAKAM">
                 </a>
                 <div>
                     <a href="{% url 'gestion:dashboard' %}" class="yakam-brand">YAKAM</a>
